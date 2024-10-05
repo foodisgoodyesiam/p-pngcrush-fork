@@ -83,10 +83,8 @@ dir="$(mktemp -d)"
 [ -z "$quiet" ] && echo "Parallel pngcrushing $input..." >&2
 
 for n in {1..177} ; do
-    pngcrush -reduce -nolimits -m "$n" $input "$dir/$n.png" 2>/dev/null >/dev/null &
-done
-
-wait
+    echo -en "$n\0$input\0$dir/$n.png\0"
+done | xargs -0 -n 3 -P $(nproc) pngcrush -reduce -nolimits -m 2>/dev/null >/dev/null
 
 #
 # sort by size to find best
